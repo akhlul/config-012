@@ -38,11 +38,13 @@ vim.keymap.set(
 -- toggleterm
 require("toggleterm").setup({
 	on_open = function(term)
-		vim.keymap.set("t", "¦", "<C-\\><C-n>", { buffer = term.bufnr, silent = true })
+		-- vim.keymap.set("t", "¦", "<C-\\><C-n>", { buffer = term.bufnr, silent = true })
+		vim.keymap.set("t", "~~", "<C-\\><C-n>", { buffer = term.bufnr, silent = true })
  end,
  terminal_mappings = true
 })
-vim.keymap.set("n", "¦", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
+-- vim.keymap.set("n", "¦", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
+vim.keymap.set("n", "~~", "<cmd>ToggleTerm<CR>", { desc = "Toggle terminal" })
 
 -- telescope
 require("telescope").load_extension("ui-select")
