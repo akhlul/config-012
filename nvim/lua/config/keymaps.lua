@@ -7,6 +7,7 @@ map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, 
 -- buffer switching
 map("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
 map("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
+map("n", "<leader>bd", ":bdelete<CR>", { desc = "Delete buffer" })
 map("n", "<leader>bb", ":e #<cr>", { desc = "Switch to last edited buffer" })
 
 -- move lines

@@ -27,7 +27,7 @@ require("neo-tree").setup({
 		hijack_netrw_behavior = "disabled",
 	},
 })
-vim.keymap.set("n", "-0", "<cmd>Neotree<CR>", { desc = "Open file explorer (neo-tree)" })
+vim.keymap.set("n", "-0", "<cmd>Neotree filesystem reveal left<CR>", { desc = "Open file explorer (neo-tree)" })
 vim.keymap.set(
 	"n",
 	"-=",
