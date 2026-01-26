@@ -1,0 +1,44 @@
+#
+# This is not sourced during shell startup and is only used to configure zimfw.
+#
+
+#
+# Modules
+#
+
+zmodule environment
+# zmodule git
+zmodule input
+zmodule termtitle
+zmodule utility
+
+# <-- Normally new modules should be added here. Check each module documentation
+# for any caveats.
+
+# zmodule joke/zim-mise
+
+#
+# Prompt
+#
+
+zmodule duration-info
+zmodule git-info
+#zmodule asciiship
+zmodule bira
+
+#
+# Completion
+#
+
+zmodule zsh-users/zsh-completions --fpath src
+zmodule completion
+
+#
+# Modules that must be initialized last
+#
+
+zmodule zsh-users/zsh-syntax-highlighting
+zmodule zsh-users/zsh-history-substring-search
+# Fish-like autosuggestions for Zsh. Add the following to your ~/.zshrc to boost
+# performance: ZSH_AUTOSUGGEST_MANUAL_REBIND=1
+zmodule zsh-users/zsh-autosuggestions
