@@ -15,13 +15,18 @@ require("mason-tool-installer").setup({
 	ensure_installed = {
 		"lua_ls",
 		"stylua",
+		"vtsls",
+		"html",
+		"cssls",
+		"svelte",
 	},
 })
 
 -- lsp configurations
 require("config.lsp.lua_lsp")
+require("config.lsp.html_css")
+require("config.lsp.vtsjs")
 require("config.lsp.svelte_lsp")
-
 
 -- completion
 require("config.lsp.completion")

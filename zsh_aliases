@@ -1,0 +1,85 @@
+alias grep='grep --color=auto'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias h='history'
+
+# Listing
+alias ls='ls --color=auto'
+alias ll='ls -lh'      # Long listing, human-readable sizes
+alias la='ls -A'       # List all files (including dotfiles)
+
+# Safety (prevent accidental file deletion)
+alias rm='rm -i'      # Prompt before every removal
+alias cp='cp -i'      # Prompt before overwriting
+# alias mv='mv -i'      # Prompt before overwriting
+
+# Open bashrc for quick editing
+alias connect_vpn_bps='sudo openfortivpn akses.bps.go.id --saml-login'
+
+# Quick Calculator
+# bc - An arbitrary precision calculator language
+function = 
+{
+  echo "$@" | bc -l
+}
+alias calc="="
+
+# Function open project folder with nvim
+RECENT_PROJECTS_FILE="$HOME/.editor_recent_projects"
+
+open_with_editor() {
+    # 1. Setup & Maintenance
+    [[ -f "$HOME/.recent_projects" && ! -f "$RECENT_PROJECTS_FILE" ]] && mv "$HOME/.recent_projects" "$RECENT_PROJECTS_FILE"
+    touch "$RECENT_PROJECTS_FILE"
+
+    if [[ "$1" == "-m" ]]; then
+        local to_delete=$(cat "$RECENT_PROJECTS_FILE" | gum choose --no-limit --header "Select to REMOVE")
+        [[ -n "$to_delete" ]] && sed -i "\|$to_delete|d" "$RECENT_PROJECTS_FILE" && gum style --foreground 212 "✨ History cleaned!"
+        return
+    fi
+
+    # 2. Selection Logic
+    local target_dir
+    if [[ -z "$1" ]]; then
+        # Read file, check if directories still exist, and reverse the list
+        local valid_projects=()
+        while IFS= read -r line; do
+            [[ -d "$line" ]] && valid_projects+=("$line")
+        done < "$RECENT_PROJECTS_FILE"
+
+        if [[ ${#valid_projects[@]} -eq 0 ]]; then
+            gum style --foreground 196 "No valid history found."
+            return 1
+        fi
+
+        # Reverse the valid projects for the picker
+        local list
+        command -v tac &>/dev/null && list=$(print -l "${valid_projects[@]}" | tac) || list=$(print -l "${valid_projects[@]}" | tail -r)
+
+        target_dir=$(echo "$list" | gum filter --placeholder "Search recent projects...")
+        [[ -z "$target_dir" ]] && return
+    else
+        target_dir=$(realpath "$1" 2>/dev/null)
+    fi
+
+    # 3. Execution & History Management
+    if [[ -d "$target_dir" ]]; then
+        cd "$target_dir" || return
+        
+        # In-memory array manipulation to avoid /tmp errors
+        local history_list=(${(f)"$(<$RECENT_PROJECTS_FILE)"})
+        history_list=(${history_list:#$target_dir}) # Remove existing
+        history_list+=("$target_dir")               # Append new
+        
+        # Keep only last 50 and write back
+        [[ ${#history_list[@]} -gt 50 ]] && history_list=(${history_list[-50,-1]})
+        print -l "${history_list[@]}" >! "$RECENT_PROJECTS_FILE"
+
+        gum spin --spinner dot --title "Waking up Neovim..." -- sleep 0.5
+        nvim .
+    else
+        gum style --foreground 196 "❌ Error: '$1' is not a valid directory."
+        return 1
+    fi
+}

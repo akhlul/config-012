@@ -7,7 +7,7 @@ map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, 
 -- buffer switching
 map("n", "<Tab>", ":bnext<CR>", { desc = "Next buffer" })
 map("n", "<S-Tab>", ":bprevious<CR>", { desc = "Previous buffer" })
-map("n", "<leader>bd", ":bdelete<CR>", { desc = "Delete buffer" })
+map("n", "<leader>bd", ":bnext <bar> bdelete #<CR>", { desc = "Delete buffer" })
 map("n", "<leader>bb", ":e #<cr>", { desc = "Switch to last edited buffer" })
 
 -- move lines
@@ -30,6 +30,9 @@ map("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
 -- toggle line wrapping
 map("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle Wrap", silent = true })
 map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Local Format" })
+
+-- toggle transparancy
+map("n", "<leader>tt", "<cmd>TransparentToggle<CR>", { desc = "Toggle transparancy", silent = true})
 
 -- workflow folder
 -- vim.keymap.set("n", "<leaeder>e", "<cmd>lua MiniFiles.open()<CR>", { desc = "Open file explorer (mini.files)"})
