@@ -68,8 +68,8 @@ end
 
 vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "Telescope - Find Files" })
 vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "Telescope - Live Grep" })
-vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope - " })
-vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope - " })
-vim.keymap.set("n", "<leader>fcc", SearchClasses, { desc = "Telescope - " })
-vim.keymap.set("n", "<leader>fcf", SearchFunctions, { desc = "Telescope - " })
-vim.keymap.set("n", "<leader>fcv", SearchVariables, { desc = "Telescope - " })
+vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "Telescope - Buffers" })
+vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope - Help Tags" })
+vim.keymap.set("n", "<leader>fcc", SearchClasses, { desc = "Telescope - Search Classes" })
+vim.keymap.set("n", "<leader>fcf", SearchFunctions, { desc = "Telescope - Search Functions" })
+vim.keymap.set("n", "<leader>fcv", SearchVariables, { desc = "Telescope - Search Variables" })
