@@ -4,6 +4,8 @@
 local map = vim.keymap.set
 local opt = vim.opt
 
+require("vim._core.ui2").enable({})
+
 -- ============================================================================
 -- Options
 -- ============================================================================
@@ -179,38 +181,36 @@ vim.g.vim_svelte_plugin_load_full_syntax = 1
 -- })
 -- Minimal Treesitter autocmd with confirmation before installing
 vim.api.nvim_create_autocmd("FileType", {
-    callback = function(args)
-        local lang = vim.treesitter.language.get_lang(args.match)
-        if not lang then
-            return
-        end
-        
-        local has_parser = pcall(vim.treesitter.get_parser, args.buf, lang, { error = false })
-        
-        if not has_parser then
-            local choice = vim.fn.confirm(
-                string.format("Install treesitter parser for '%s'?", lang),
-                "&Yes\n&No",
-                1
-            )
-            
-            if choice == 1 then
-                vim.notify(string.format("Installing %s...", lang))
-                pcall(require("nvim-treesitter.install").update, { with_sync = true }, lang)
-                pcall(vim.treesitter.start, args.buf, lang)
-            else
-                vim.bo[args.buf].syntax = "on"
-            end
-        else
-            pcall(vim.treesitter.start, args.buf, lang)
-        end
-    end,
+	callback = function(args)
+		local lang = vim.treesitter.language.get_lang(args.match)
+		if not lang then
+			return
+		end
+
+		local has_parser = pcall(vim.treesitter.get_parser, args.buf, lang, { error = false })
+
+		if not has_parser then
+			local choice = vim.fn.confirm(string.format("Install treesitter parser for '%s'?", lang), "&Yes\n&No", 1)
+
+			if choice == 1 then
+				vim.notify(string.format("Installing %s...", lang))
+				pcall(require("nvim-treesitter.install").update, { with_sync = true }, lang)
+				pcall(vim.treesitter.start, args.buf, lang)
+			else
+				vim.bo[args.buf].syntax = "on"
+			end
+		else
+			pcall(vim.treesitter.start, args.buf, lang)
+		end
+	end,
 })
 
-
 -- Colorscheme
+	-- default_scheme = "base24-eldritch",
+	-- default_scheme = "base24-laser",
+	-- default_scheme = "base24-rippedcasts",
 require("tinted-nvim").setup({
-	default_scheme = "base24-papercolor-dark",
+	default_scheme = "base24-eldritch",
 	apply_scheme_on_startup = true,
 	ui = {
 		transparent = false,
@@ -331,7 +331,12 @@ map("n", "<leader>fk", builtin.keymaps, { desc = "Keymaps" })
 -- Mason & LSP
 require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "jsonls", "intelephense" },
+	ensure_installed = { 
+		"lua_ls", 
+		"ts_ls", 
+		"html", "cssls", "jsonls", 
+		-- "intelephense" 
+	},
 	automatic_installation = false,
 })
 
@@ -357,10 +362,15 @@ vim.lsp.config("ts_ls", {
 vim.lsp.config("html", { filetypes = { "html" } })
 vim.lsp.config("cssls", { filetypes = { "css", "scss", "less" } })
 vim.lsp.config("jsonls", { filetypes = { "json" } })
-vim.lsp.config("intelephense", { filetypes = { "php", "blade" } })
+vim.lsp.config("php-lsp", {
+	cmd = { "/home/karom/.local/bin/php-lsp" },
+	filetypes = { "php", "blade" },
+	root_markers = { "composer.json", ".git" },
+	workspace_required = true,
+})
 
 -- Auto-enable LSP
-local servers = { "lua_ls", "ts_ls", "html", "cssls", "jsonls", "intelephense" }
+local servers = { "lua_ls", "ts_ls", "html", "cssls", "jsonls", "php-lsp" }
 for _, server in ipairs(servers) do
 	vim.lsp.enable(server)
 end
@@ -492,6 +502,53 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 	callback = function(event)
 		local file = vim.uv.fs_realpath(event.match) or event.match
 		vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
+	end,
+})
+
+-- ============================================================================
+-- Sessions
+-- ============================================================================
+-- based on https://sam.bossley.com/thoughts/26/04/session-management-in-neovim/
+
+local session_file = "/.git/session.vim"
+vim.opt.sessionoptions = "buffers,curdir,folds,winsize"
+
+vim.api.nvim_create_autocmd("VimEnter", {
+	nested = true,
+	callback = function(e)
+		local dir = e.file
+		if vim.fn.isdirectory(dir) ~= 1 then
+			return
+		end
+
+		vim.api.nvim_set_current_dir(dir)
+		vim.g.opened_dir = dir
+
+		local is_git = vim.fn.isdirectory(dir .. "/.git") == 1
+		local is_home = dir == vim.fn.expand("~")
+		if not (is_git or is_home) then
+			return
+		end
+
+		-- undodir path "~/.local/share/nvim/undodir"
+		local file = is_home
+			and vim.fn.expand("~/.local/share/home-session.vim")
+			or dir .. session_file
+
+		vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
+		vim.g.session_file = file
+		if vim.fn.filereadable(file) == 1 then
+			vim.cmd("so " .. file)
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd("VimLeave", {
+	callback = function()
+		if vim.g.session_file then
+			vim.fn.mkdir(vim.fn.fnamemodify(vim.g.session_file, ":h"), "p")
+			vim.cmd("mks! " .. vim.g.session_file)
+		end
 	end,
 })
 
