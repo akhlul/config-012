@@ -14,6 +14,10 @@ alias rm='rm -i'      # Prompt before every removal
 alias cp='cp -i'      # Prompt before overwriting
 # alias mv='mv -i'      # Prompt before overwriting
 
+# Editor
+alias nl="NVIM_APPNAME=nvim_lama nvim"
+alias diff="diff -u --color"
+
 # Open bashrc for quick editing
 alias connect_vpn_bps='sudo openfortivpn akses.bps.go.id --saml-login'
 

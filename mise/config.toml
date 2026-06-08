@@ -1,0 +1,12 @@
+[tools]
+bun = "latest"
+crystal = "latest"
+go = "latest"
+node = "latest"
+php = "8.4"
+rust = "latest"
+zig = "0.15.2"
+
+[env._.php]
+prebuilt_static = true
+prebuilt_static_flavor = "bulk"
