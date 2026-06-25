@@ -105,7 +105,7 @@ map("n", "[q", "<cmd>cprev<CR>", { desc = "Previous quickfix" })
 
 map("n", "<leader>tw", "<cmd>set wrap!<CR>", { desc = "Toggle wrap" })
 map("n", "<leader>tt", "<cmd>TransparentToggle<CR>", { desc = "Toggle transparency" })
-map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format" })
+-- map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format" })
 
 map("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
 map("n", "gr", vim.lsp.buf.references, { desc = "References" })
@@ -126,9 +126,6 @@ vim.pack.add({ "https://github.com/nvim-mini/mini.icons" })
 vim.pack.add({ "https://github.com/nvim-mini/mini.tabline" })
 vim.pack.add({ "https://github.com/lewis6991/gitsigns.nvim" })
 
--- Treesitter
-vim.pack.add({ "https://github.com/nvim-treesitter/nvim-treesitter" })
-
 -- Workflow
 vim.pack.add({ "https://github.com/nvim-mini/mini.files" })
 vim.pack.add({ "https://github.com/nvim-telescope/telescope.nvim" })
@@ -143,6 +140,12 @@ vim.pack.add({ "https://github.com/neovim/nvim-lspconfig" })
 vim.pack.add({ "https://github.com/mason-org/mason.nvim" })
 vim.pack.add({ "https://github.com/mason-org/mason-lspconfig.nvim" })
 vim.pack.add({ "https://github.com/jwalton512/vim-blade" })
+
+-- Treesitter
+vim.pack.add({ "https://github.com/nvim-treesitter/nvim-treesitter" })
+
+-- Formatter
+vim.pack.add({ "https://github.com/stevearc/conform.nvim" })
 
 -- Completion (nvim-cmp)
 vim.pack.add({ "https://github.com/hrsh7th/nvim-cmp" })
@@ -206,9 +209,9 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Colorscheme
-	-- default_scheme = "base24-eldritch",
-	-- default_scheme = "base24-laser",
-	-- default_scheme = "base24-rippedcasts",
+-- default_scheme = "base24-eldritch",
+-- default_scheme = "base24-laser",
+-- default_scheme = "base24-rippedcasts",
 require("tinted-nvim").setup({
 	default_scheme = "base24-eldritch",
 	apply_scheme_on_startup = true,
@@ -331,11 +334,13 @@ map("n", "<leader>fk", builtin.keymaps, { desc = "Keymaps" })
 -- Mason & LSP
 require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = { 
-		"lua_ls", 
-		"ts_ls", 
-		"html", "cssls", "jsonls", 
-		-- "intelephense" 
+	ensure_installed = {
+		"lua_ls",
+		"ts_ls",
+		"html",
+		"cssls",
+		"jsonls",
+		-- "intelephense"
 	},
 	automatic_installation = false,
 })
@@ -362,15 +367,14 @@ vim.lsp.config("ts_ls", {
 vim.lsp.config("html", { filetypes = { "html" } })
 vim.lsp.config("cssls", { filetypes = { "css", "scss", "less" } })
 vim.lsp.config("jsonls", { filetypes = { "json" } })
-vim.lsp.config("php-lsp", {
-	cmd = { "/home/karom/.local/bin/php-lsp" },
+vim.lsp.config("phpls", {
+	cmd = { "/home/karom/.local/bin/tusk-php", "--transport", "stdio" },
 	filetypes = { "php", "blade" },
 	root_markers = { "composer.json", ".git" },
-	workspace_required = true,
 })
 
 -- Auto-enable LSP
-local servers = { "lua_ls", "ts_ls", "html", "cssls", "jsonls", "php-lsp" }
+local servers = { "lua_ls", "ts_ls", "html", "cssls", "jsonls", "phpls" }
 for _, server in ipairs(servers) do
 	vim.lsp.enable(server)
 end
@@ -425,6 +429,42 @@ cmp.setup({
 		{ name = "buffer" },
 		{ name = "path" },
 	}),
+})
+
+-- ============================================================================
+-- Formatters
+-- ============================================================================
+
+require("conform").setup({
+	formatters_by_ft = {
+		blade = { "blade-formatter" },
+		php = { "pint" },
+	},
+	formatters = {
+		["blade-formatter"] = {
+			prepend_args = { "--indent-size", "2" },
+		},
+		["pint"] = {
+			prepend_args = { "--indent-width=2" },
+		},
+	},
+})
+
+-- Bind the conditional keymap safely inside LspAttach
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("my.lsp", {}),
+	callback = function(ev)
+		local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+
+		vim.keymap.set("n", "<leader>lf", function()
+			local conform = package.loaded["conform"]
+			if conform and conform.list_formatters(ev.buf)[1] then
+				conform.format({ bufnr = ev.buf, lsp_format = "fallback" })
+			else
+				vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
+			end
+		end, { desc = "Format (Conform -> LSP Fallback)", buffer = ev.buf })
+	end,
 })
 
 -- ============================================================================
@@ -531,9 +571,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
 		end
 
 		-- undodir path "~/.local/share/nvim/undodir"
-		local file = is_home
-			and vim.fn.expand("~/.local/share/home-session.vim")
-			or dir .. session_file
+		local file = is_home and vim.fn.expand("~/.local/share/home-session.vim") or dir .. session_file
 
 		vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
 		vim.g.session_file = file
