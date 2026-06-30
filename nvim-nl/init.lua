@@ -184,28 +184,28 @@ vim.g.vim_svelte_plugin_load_full_syntax = 1
 -- })
 -- Minimal Treesitter autocmd with confirmation before installing
 vim.api.nvim_create_autocmd("FileType", {
-	callback = function(args)
-		local lang = vim.treesitter.language.get_lang(args.match)
-		if not lang then
-			return
-		end
+  callback = function(args)
+    local lang = vim.treesitter.language.get_lang(args.match)
+    if not lang then
+      return
+    end
 
-		local has_parser = pcall(vim.treesitter.get_parser, args.buf, lang, { error = false })
+    local has_parser = pcall(vim.treesitter.get_parser, args.buf, lang, { error = false })
 
-		if not has_parser then
-			local choice = vim.fn.confirm(string.format("Install treesitter parser for '%s'?", lang), "&Yes\n&No", 1)
+    if not has_parser then
+      local choice = vim.fn.confirm(string.format("Install treesitter parser for '%s'?", lang), "&Yes\n&No", 1)
 
-			if choice == 1 then
-				vim.notify(string.format("Installing %s...", lang))
-				pcall(require("nvim-treesitter.install").update, { with_sync = true }, lang)
-				pcall(vim.treesitter.start, args.buf, lang)
-			else
-				vim.bo[args.buf].syntax = "on"
-			end
-		else
-			pcall(vim.treesitter.start, args.buf, lang)
-		end
-	end,
+      if choice == 1 then
+        vim.notify(string.format("Installing %s...", lang))
+        pcall(require("nvim-treesitter.install").update, { with_sync = true }, lang)
+        pcall(vim.treesitter.start, args.buf, lang)
+      else
+        vim.bo[args.buf].syntax = "on"
+      end
+    else
+      pcall(vim.treesitter.start, args.buf, lang)
+    end
+  end,
 })
 
 -- Colorscheme
@@ -213,28 +213,28 @@ vim.api.nvim_create_autocmd("FileType", {
 -- default_scheme = "base24-laser",
 -- default_scheme = "base24-rippedcasts",
 require("tinted-nvim").setup({
-	default_scheme = "base24-eldritch",
-	apply_scheme_on_startup = true,
-	ui = {
-		transparent = false,
-	},
-	selector = {
-		enabled = false,
-	},
+  default_scheme = "base24-eldritch",
+  apply_scheme_on_startup = true,
+  ui = {
+    transparent = false,
+  },
+  selector = {
+    enabled = false,
+  },
 })
 
 -- Transparency
 require("transparent").setup({
-	auto = true,
-	extra_groups = {
-		"MiniFilesNormal",
-		"MiniFilesBorder",
-		"MiniFilesBufferDir",
-		"TelescopeNormal",
-		"TelescopeBorder",
-		"TelescopePromptNormal",
-	},
-	excludes = { "NormalFloat" },
+  auto = true,
+  extra_groups = {
+    "MiniFilesNormal",
+    "MiniFilesBorder",
+    "MiniFilesBufferDir",
+    "TelescopeNormal",
+    "TelescopeBorder",
+    "TelescopePromptNormal",
+  },
+  excludes = { "NormalFloat" },
 })
 
 -- Mini Icons
@@ -242,43 +242,43 @@ require("mini.icons").setup()
 
 -- Mini Tabline
 local function get_neotree_width()
-	for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-		local buf = vim.api.nvim_win_get_buf(win)
-		if vim.bo[buf].filetype == "neo-tree" then
-			return vim.api.nvim_win_get_width(win)
-		end
-	end
-	return 0
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.bo[buf].filetype == "neo-tree" then
+      return vim.api.nvim_win_get_width(win)
+    end
+  end
+  return 0
 end
 
 require("mini.tabline").setup({
-	icons = true,
-	format = function(buf_id, label)
-		local default_label = MiniTabline.default_format(buf_id, label)
-		local n_width = get_neotree_width()
-		local bufs = vim.api.nvim_list_bufs()
-		local first_buf = nil
-		for _, b in ipairs(bufs) do
-			if vim.bo[b].buflisted then
-				first_buf = b
-				break
-			end
-		end
-		if n_width > 0 and buf_id == first_buf then
-			return string.rep(" ", n_width + 1) .. default_label
-		end
-		return default_label
-	end,
+  icons = true,
+  format = function(buf_id, label)
+    local default_label = MiniTabline.default_format(buf_id, label)
+    local n_width = get_neotree_width()
+    local bufs = vim.api.nvim_list_bufs()
+    local first_buf = nil
+    for _, b in ipairs(bufs) do
+      if vim.bo[b].buflisted then
+        first_buf = b
+        break
+      end
+    end
+    if n_width > 0 and buf_id == first_buf then
+      return string.rep(" ", n_width + 1) .. default_label
+    end
+    return default_label
+  end,
 })
 
 -- Gitsigns
 require("gitsigns").setup({
-	signs = {
-		add = { text = "│" },
-		change = { text = "│" },
-		delete = { text = "_" },
-		topdelete = { text = "‾" },
-	},
+  signs = {
+    add = { text = "│" },
+    change = { text = "│" },
+    delete = { text = "_" },
+    topdelete = { text = "‾" },
+  },
 })
 
 -- Mini Pairs & Comment
@@ -287,40 +287,40 @@ require("mini.comment").setup()
 
 -- Mini Files
 local function toggle_minifiles()
-	if not MiniFiles.close() then
-		MiniFiles.open()
-	end
+  if not MiniFiles.close() then
+    MiniFiles.open()
+  end
 end
 require("mini.files").setup()
 map("n", "--", toggle_minifiles, { desc = "Toggle mini.files" })
 
 -- Neo-tree
 require("neo-tree").setup({
-	sources = { "filesystem", "buffers", "git_status" },
-	filesystem = { hijack_netrw_behavior = "disabled" },
+  sources = { "filesystem", "buffers", "git_status" },
+  filesystem = { hijack_netrw_behavior = "disabled" },
 })
 map("n", "-0", "<cmd>Neotree filesystem reveal left toggle<CR>", { desc = "Neo-tree left" })
 map("n", "-=", "<cmd>Neotree filesystem reveal right toggle<CR>", { desc = "Neo-tree right" })
 
 -- ToggleTerm
 require("toggleterm").setup({
-	size = 20,
-	open_mapping = "~~",
-	start_in_insert = true,
-	direction = "float",
-	float_opts = { border = "curved" },
+  size = 20,
+  open_mapping = "~~",
+  start_in_insert = true,
+  direction = "float",
+  float_opts = { border = "curved" },
 })
 map("t", "~~", "<C-\\><C-n>", { desc = "Exit terminal" })
 
 -- Telescope
 require("telescope").setup({
-	defaults = {
-		layout_strategy = "horizontal",
-		sorting_strategy = "ascending",
-		winblend = 10,
-		border = true,
-	},
-	extensions = { ["ui-select"] = { require("telescope.themes").get_dropdown() } },
+  defaults = {
+    layout_strategy = "horizontal",
+    sorting_strategy = "ascending",
+    winblend = 10,
+    border = true,
+  },
+  extensions = { ["ui-select"] = { require("telescope.themes").get_dropdown() } },
 })
 require("telescope").load_extension("ui-select")
 
@@ -334,56 +334,56 @@ map("n", "<leader>fk", builtin.keymaps, { desc = "Keymaps" })
 -- Mason & LSP
 require("mason").setup()
 require("mason-lspconfig").setup({
-	ensure_installed = {
-		"lua_ls",
-		"ts_ls",
-		"html",
-		"cssls",
-		"jsonls",
-		-- "intelephense"
-	},
-	automatic_installation = false,
+  ensure_installed = {
+    "lua_ls",
+    "ts_ls",
+    "html",
+    "cssls",
+    "jsonls",
+    -- "intelephense"
+  },
+  automatic_installation = false,
 })
 
 -- LSP configuration (nvim 0.12 native)
 vim.lsp.config("lua_ls", {
-	settings = {
-		Lua = {
-			runtime = { version = "LuaJIT" },
-			diagnostics = { globals = { "vim", "require" } },
-			workspace = {
-				library = vim.api.nvim_get_runtime_file("", true),
-				checkThirdParty = false,
-			},
-			telemetry = { enable = false },
-		},
-	},
+  settings = {
+    Lua = {
+      runtime = { version = "LuaJIT" },
+      diagnostics = { globals = { "vim", "require" } },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false,
+      },
+      telemetry = { enable = false },
+    },
+  },
 })
 
 vim.lsp.config("ts_ls", {
-	filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
+  filetypes = { "javascript", "javascriptreact", "typescript", "typescriptreact" },
 })
 
 vim.lsp.config("html", { filetypes = { "html" } })
 vim.lsp.config("cssls", { filetypes = { "css", "scss", "less" } })
 vim.lsp.config("jsonls", { filetypes = { "json" } })
 vim.lsp.config("phpls", {
-	cmd = { "/home/karom/.local/bin/tusk-php", "--transport", "stdio" },
-	filetypes = { "php", "blade" },
-	root_markers = { "composer.json", ".git" },
+  cmd = { "~/.local/bin/tusk-php", "--transport", "stdio" },
+  filetypes = { "php", "blade" },
+  root_markers = { "composer.json", ".git" },
 })
 
 -- Auto-enable LSP
 local servers = { "lua_ls", "ts_ls", "html", "cssls", "jsonls", "phpls" }
 for _, server in ipairs(servers) do
-	vim.lsp.enable(server)
+  vim.lsp.enable(server)
 end
 
 -- Explicitly map .blade.php extensions
 vim.filetype.add({
-	pattern = {
-		[".*%.blade%.php"] = "blade",
-	},
+  pattern = {
+    [".*%.blade%.php"] = "blade",
+  },
 })
 
 -- Completion (nvim-cmp)
@@ -392,43 +392,43 @@ local luasnip = require("luasnip")
 require("luasnip.loaders.from_vscode").lazy_load()
 
 cmp.setup({
-	snippet = {
-		expand = function(args)
-			luasnip.lsp_expand(args.body)
-		end,
-	},
-	mapping = cmp.mapping.preset.insert({
-		["<C-b>"] = cmp.mapping.scroll_docs(-4),
-		["<C-f>"] = cmp.mapping.scroll_docs(4),
-		["<C-Space>"] = cmp.mapping.complete(),
-		["<C-e>"] = cmp.mapping.abort(),
-		["<CR>"] = cmp.mapping.confirm({ select = true }),
-		["<Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_next_item()
-			elseif luasnip.expand_or_jumpable() then
-				luasnip.expand_or_jump()
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-		["<S-Tab>"] = cmp.mapping(function(fallback)
-			if cmp.visible() then
-				cmp.select_prev_item()
-			elseif luasnip.jumpable(-1) then
-				luasnip.jump(-1)
-			else
-				fallback()
-			end
-		end, { "i", "s" }),
-	}),
-	sources = cmp.config.sources({
-		{ name = "nvim_lsp" },
-		{ name = "luasnip" },
-	}, {
-		{ name = "buffer" },
-		{ name = "path" },
-	}),
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end,
+  },
+  mapping = cmp.mapping.preset.insert({
+    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+    ["<C-Space>"] = cmp.mapping.complete(),
+    ["<C-e>"] = cmp.mapping.abort(),
+    ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+  }),
+  sources = cmp.config.sources({
+    { name = "nvim_lsp" },
+    { name = "luasnip" },
+  }, {
+    { name = "buffer" },
+    { name = "path" },
+  }),
 })
 
 -- ============================================================================
@@ -436,36 +436,31 @@ cmp.setup({
 -- ============================================================================
 
 require("conform").setup({
-	formatters_by_ft = {
-		blade = { "blade-formatter" },
-		php = { "pint" },
-	},
-	formatters = {
-		["blade-formatter"] = {
-			prepend_args = { "--indent-size", "2" },
-		},
-		["pint"] = {
-			prepend_args = { "--indent-width=2" },
-		},
-	},
+  formatters_by_ft = {
+    blade = { "blade-formatter" },
+    php = { "pint" },
+  },
+  formatters = {
+    ["blade-formatter"] = {
+      command = "blade-formatter",
+      stdin = true,
+      prepend_args = { "--stdin", "--indent-size", "2" },
+    },
+  },
 })
 
 -- Bind the conditional keymap safely inside LspAttach
-vim.api.nvim_create_autocmd("LspAttach", {
-	group = vim.api.nvim_create_augroup("my.lsp", {}),
-	callback = function(ev)
-		local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
-
-		vim.keymap.set("n", "<leader>lf", function()
-			local conform = package.loaded["conform"]
-			if conform and conform.list_formatters(ev.buf)[1] then
-				conform.format({ bufnr = ev.buf, lsp_format = "fallback" })
-			else
-				vim.lsp.buf.format({ bufnr = ev.buf, id = client.id, timeout_ms = 1000 })
-			end
-		end, { desc = "Format (Conform -> LSP Fallback)", buffer = ev.buf })
-	end,
-})
+vim.keymap.set("n", "<leader>lf", function()
+	local has_conform, conform = pcall(require, "conform")
+	
+	if has_conform and conform.list_formatters(0)[1] then
+		print("[Conform] Formatting with " .. conform.list_formatters(0)[1].name)
+		conform.format({ bufnr = 0, lsp_format = "fallback", timeout_ms = 3000 })
+	else
+		print("[LSP] Falling back to native LSP format")
+		vim.lsp.buf.format({ bufnr = 0, timeout_ms = 1000 })
+	end
+end, { desc = "Format (Conform -> LSP Fallback)" })
 
 -- ============================================================================
 -- Diagnostics
@@ -479,35 +474,35 @@ vim.api.nvim_set_hl(0, "DiagnosticInfoLine", { bg = palette.info, blend = 10 })
 vim.api.nvim_set_hl(0, "DiagnosticHintLine", { bg = palette.hint, blend = 10 })
 
 vim.diagnostic.config({
-	underline = true,
-	severity_sort = true,
-	update_in_insert = false,
-	float = { border = "rounded", source = true },
-	signs = {
-		text = {
-			[vim.diagnostic.severity.ERROR] = "●",
-			[vim.diagnostic.severity.WARN] = "●",
-			[vim.diagnostic.severity.INFO] = "●",
-			[vim.diagnostic.severity.HINT] = "",
-		},
-	},
-	virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
-	linehl = {
-		[vim.diagnostic.severity.ERROR] = "DiagnosticErrorLine",
-		[vim.diagnostic.severity.WARN] = "DiagnosticWarnLine",
-		[vim.diagnostic.severity.INFO] = "DiagnosticInfoLine",
-		[vim.diagnostic.severity.HINT] = "DiagnosticHintLine",
-	},
+  underline = true,
+  severity_sort = true,
+  update_in_insert = false,
+  float = { border = "rounded", source = true },
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "●",
+      [vim.diagnostic.severity.WARN] = "●",
+      [vim.diagnostic.severity.INFO] = "●",
+      [vim.diagnostic.severity.HINT] = "",
+    },
+  },
+  virtual_text = { spacing = 4, source = "if_many", prefix = "●" },
+  linehl = {
+    [vim.diagnostic.severity.ERROR] = "DiagnosticErrorLine",
+    [vim.diagnostic.severity.WARN] = "DiagnosticWarnLine",
+    [vim.diagnostic.severity.INFO] = "DiagnosticInfoLine",
+    [vim.diagnostic.severity.HINT] = "DiagnosticHintLine",
+  },
 })
 
 local function diag_goto(next, severity)
-	return function()
-		vim.diagnostic.jump({
-			count = next and 1 or -1,
-			float = true,
-			severity = severity and vim.diagnostic.severity[severity] or nil,
-		})
-	end
+  return function()
+    vim.diagnostic.jump({
+      count = next and 1 or -1,
+      float = true,
+      severity = severity and vim.diagnostic.severity[severity] or nil,
+    })
+  end
 end
 
 map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line diagnostics" })
@@ -523,26 +518,26 @@ map("n", "[w", diag_goto(false, "WARN"), { desc = "Prev warning" })
 -- ============================================================================
 
 vim.api.nvim_create_autocmd("BufReadPost", {
-	callback = function()
-		local mark = vim.api.nvim_buf_get_mark(0, '"')
-		local lcount = vim.api.nvim_buf_line_count(0)
-		if mark[1] > 0 and mark[1] <= lcount then
-			pcall(vim.api.nvim_win_set_cursor, 0, mark)
-		end
-	end,
+  callback = function()
+    local mark = vim.api.nvim_buf_get_mark(0, '"')
+    local lcount = vim.api.nvim_buf_line_count(0)
+    if mark[1] > 0 and mark[1] <= lcount then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
+  end,
 })
 
 vim.api.nvim_create_autocmd("TextYankPost", {
-	callback = function()
-		vim.highlight.on_yank({ higroup = "IncSearch", timeout = 150 })
-	end,
+  callback = function()
+    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 150 })
+  end,
 })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-	callback = function(event)
-		local file = vim.uv.fs_realpath(event.match) or event.match
-		vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
-	end,
+  callback = function(event)
+    local file = vim.uv.fs_realpath(event.match) or event.match
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
+  end,
 })
 
 -- ============================================================================
@@ -554,40 +549,40 @@ local session_file = "/.git/session.vim"
 vim.opt.sessionoptions = "buffers,curdir,folds,winsize"
 
 vim.api.nvim_create_autocmd("VimEnter", {
-	nested = true,
-	callback = function(e)
-		local dir = e.file
-		if vim.fn.isdirectory(dir) ~= 1 then
-			return
-		end
+  nested = true,
+  callback = function(e)
+    local dir = e.file
+    if vim.fn.isdirectory(dir) ~= 1 then
+      return
+    end
 
-		vim.api.nvim_set_current_dir(dir)
-		vim.g.opened_dir = dir
+    vim.api.nvim_set_current_dir(dir)
+    vim.g.opened_dir = dir
 
-		local is_git = vim.fn.isdirectory(dir .. "/.git") == 1
-		local is_home = dir == vim.fn.expand("~")
-		if not (is_git or is_home) then
-			return
-		end
+    local is_git = vim.fn.isdirectory(dir .. "/.git") == 1
+    local is_home = dir == vim.fn.expand("~")
+    if not (is_git or is_home) then
+      return
+    end
 
-		-- undodir path "~/.local/share/nvim/undodir"
-		local file = is_home and vim.fn.expand("~/.local/share/home-session.vim") or dir .. session_file
+    -- undodir path "~/.local/share/nvim/undodir"
+    local file = is_home and vim.fn.expand("~/.local/share/home-session.vim") or dir .. session_file
 
-		vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
-		vim.g.session_file = file
-		if vim.fn.filereadable(file) == 1 then
-			vim.cmd("so " .. file)
-		end
-	end,
+    vim.fn.mkdir(vim.fn.fnamemodify(file, ":h"), "p")
+    vim.g.session_file = file
+    if vim.fn.filereadable(file) == 1 then
+      vim.cmd("so " .. file)
+    end
+  end,
 })
 
 vim.api.nvim_create_autocmd("VimLeave", {
-	callback = function()
-		if vim.g.session_file then
-			vim.fn.mkdir(vim.fn.fnamemodify(vim.g.session_file, ":h"), "p")
-			vim.cmd("mks! " .. vim.g.session_file)
-		end
-	end,
+  callback = function()
+    if vim.g.session_file then
+      vim.fn.mkdir(vim.fn.fnamemodify(vim.g.session_file, ":h"), "p")
+      vim.cmd("mks! " .. vim.g.session_file)
+    end
+  end,
 })
 
 -- ============================================================================
@@ -595,26 +590,26 @@ vim.api.nvim_create_autocmd("VimLeave", {
 -- ============================================================================
 
 if vim.g.neoray then
-	vim.opt.guifont = "Maple Mono NF:h14"
+  vim.opt.guifont = "Maple Mono NF:h14"
 
-	local function change_font(delta)
-		local font = vim.o.guifont
-		local base, size = font:match("(.+):h(%d+)")
-		if size then
-			local new = math.max(8, tonumber(size) + delta)
-			vim.opt.guifont = base .. ":h" .. new
-		end
-	end
+  local function change_font(delta)
+    local font = vim.o.guifont
+    local base, size = font:match("(.+):h(%d+)")
+    if size then
+      local new = math.max(8, tonumber(size) + delta)
+      vim.opt.guifont = base .. ":h" .. new
+    end
+  end
 
-	map("n", "<C-0>", "<cmd>set guifont=Maple\\ Mono\\ NF:h14<CR>", { desc = "Reset font" })
-	map("n", "<C-+>", function()
-		change_font(1)
-	end, { desc = "Increase font" })
-	map("n", "<C-->", function()
-		change_font(-1)
-	end, { desc = "Decrease font" })
+  map("n", "<C-0>", "<cmd>set guifont=Maple\\ Mono\\ NF:h14<CR>", { desc = "Reset font" })
+  map("n", "<C-+>", function()
+    change_font(1)
+  end, { desc = "Increase font" })
+  map("n", "<C-->", function()
+    change_font(-1)
+  end, { desc = "Decrease font" })
 
-	vim.cmd([[
+  vim.cmd([[
     NeoraySet CursorAnimTime 0.08
     NeoraySet Transparency 0.9
   ]])
